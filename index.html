@@ -19,6 +19,17 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      overflow: hidden;
+    }
+
+    /* Pin the canvas behind everything across the entire screen */
+    #particleCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1; /* Places it behind your page text */
     }
 
     main {
@@ -28,8 +39,95 @@
   </style>
 </head>
 <body>
+  <!-- The drawing board where JavaScript renders the floating dots & lines -->
+  <canvas id="particleCanvas"></canvas>
+
   <main>
     <h1>S.A.M.</h1>
   </main>
+
+  <script>
+    const canvas = document.getElementById("particleCanvas");
+    const ctx = canvas.getContext("2d");
+
+    // ==========================================
+    // CUSTOMIZABLE SETTINGS
+    // ==========================================
+    const PARTICLE_COUNT = 75;       // How many dots float around
+    const MAX_DISTANCE = 140;        // Max distance (in px) for two dots to connect with a line
+    const PARTICLE_SPEED = 0.6;      // How fast the dots drift
+    const DOT_COLOR = "#8ea1e1";     // Color of the dots
+    const LINE_COLOR = "88, 101, 242"; // RGB color of connecting lines (Discord Blurple)
+
+    let particles = [];
+
+    // Resize the canvas whenever the browser window changes size
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas();
+
+    // Create all starting particles at random positions & directions
+    function initParticles() {
+      particles = [];
+      for (let i = 0; i < PARTICLE_COUNT; i++) {
+        particles.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          vx: (Math.random() - 0.5) * PARTICLE_SPEED * 2,
+          vy: (Math.random() - 0.5) * PARTICLE_SPEED * 2,
+          radius: Math.random() * 2 + 1.5
+        });
+      }
+    }
+
+    // Main animation loop (runs ~60 times per second)
+    function animate() {
+      // 1. Wipe the previous frame clean
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // 2. Move and draw every dot
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+
+        // Bounce softly off the edges of the screen
+        if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+        if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fillStyle = DOT_COLOR;
+        ctx.fill();
+
+        // 3. Check distance to every other dot and draw a fading line if close enough
+        for (let j = i + 1; j < particles.length; j++) {
+          const p2 = particles[j];
+          const dx = p.x - p2.x;
+          const dy = p.y - p2.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          if (dist < MAX_DISTANCE) {
+            // Line fades smoothly to 0 opacity as dots move farther apart
+            const opacity = 1 - dist / MAX_DISTANCE;
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.strokeStyle = `rgba(${LINE_COLOR}, ${opacity * 0.45})`;
+            ctx.lineWidth = 1;
+            ctx.stroke();
+          }
+        }
+      }
+
+      requestAnimationFrame(animate);
+    }
+
+    initParticles();
+    animate();
+  </script>
 </body>
 </html>
