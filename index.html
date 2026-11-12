@@ -28,8 +28,8 @@
       top: 0;
       left: 0;
       width: 100%;
-      height: 100%;
-      z-index: -1; /* Places it behind your page text */
+      height: 100lvh;
+      z-index: -1;
     }
 
     main {
@@ -39,7 +39,6 @@
   </style>
 </head>
 <body>
-  <!-- The drawing board where JavaScript renders the floating dots & lines -->
   <canvas id="particleCanvas"></canvas>
 
   <main>
@@ -50,69 +49,107 @@
     const canvas = document.getElementById("particleCanvas");
     const ctx = canvas.getContext("2d");
 
+     // ==========================================
+    // LAPTOP VIEWPORT BASELINE (1862 x 880)
     // ==========================================
-    // CUSTOMIZABLE SETTINGS
-    // ==========================================
-    const PARTICLE_COUNT = 75;       // How many dots float around
-    const MAX_DISTANCE = 140;        // Max distance (in px) for two dots to connect with a line
-    const PARTICLE_SPEED = 0.6;      // How fast the dots drift
-    const DOT_COLOR = "#8ea1e1";     // Color of the dots
-    const LINE_COLOR = "88, 101, 242"; // RGB color of connecting lines (Discord Blurple)
+    const BASE_WIDTH = 1862;
+    const BASE_HEIGHT = 880;
+    const BASE_AREA = BASE_WIDTH * BASE_HEIGHT;
+    const BASE_DIAGONAL = Math.hypot(BASE_WIDTH, BASE_HEIGHT);
+
+    const BASE_PARTICLE_COUNT = 115;    // Increased from 75 for a fuller web across all window sizes
+    const BASE_MAX_DISTANCE = 140;      // Exact 140px line reach on your laptop
+    const BASE_SPEED = 0.6;             // Exact 0.6 speed on your laptop
+    const DOT_COLOR = "#8ea1e1";
+    const LINE_COLOR = "88, 101, 242";
 
     let particles = [];
+    let currentMaxDistance = BASE_MAX_DISTANCE;
+    let lastWidth = window.innerWidth;
 
-    // Resize the canvas whenever the browser window changes size
-    function resizeCanvas() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+        function getResponsiveConfig() {
+      const area = canvas.width * canvas.height;
+      const diagonal = Math.hypot(canvas.width, canvas.height);
+
+      // Using Math.sqrt(area / BASE_AREA) gives a gentler drop-off on phones
+      // while keeping your laptop at the exact same 75 points
+      const areaScale = Math.sqrt(area / BASE_AREA);
+      const count = Math.max(32, Math.round(BASE_PARTICLE_COUNT * areaScale));
+
+      // Keep speed & link distance identical to before
+      const diagRatio = Math.max(0.45, Math.min(1.25, diagonal / BASE_DIAGONAL));
+      const speed = BASE_SPEED * diagRatio;
+      const maxDistance = BASE_MAX_DISTANCE * Math.max(0.65, diagRatio);
+
+      return { count, speed, maxDistance };
     }
-    window.addEventListener("resize", resizeCanvas);
-    resizeCanvas();
 
-    // Create all starting particles at random positions & directions
     function initParticles() {
+      const { count, speed, maxDistance } = getResponsiveConfig();
+      currentMaxDistance = maxDistance;
       particles = [];
-      for (let i = 0; i < PARTICLE_COUNT; i++) {
+
+      for (let i = 0; i < count; i++) {
         particles.push({
           x: Math.random() * canvas.width,
           y: Math.random() * canvas.height,
-          vx: (Math.random() - 0.5) * PARTICLE_SPEED * 2,
-          vy: (Math.random() - 0.5) * PARTICLE_SPEED * 2,
+          vx: (Math.random() - 0.5) * speed * 2,
+          vy: (Math.random() - 0.5) * speed * 2,
           radius: Math.random() * 2 + 1.5
         });
       }
     }
 
-    // Main animation loop (runs ~60 times per second)
-    function animate() {
-      // 1. Wipe the previous frame clean
+        function resizeCanvas() {
+      const widthChanged = window.innerWidth !== lastWidth;
+      const heightDiff = Math.abs(window.innerHeight - canvas.height);
+
+      // Rebuilds cleanly when resizing VS Code split panes or rotating a phone
+      if (widthChanged || heightDiff > 40) {
+        lastWidth = window.innerWidth;
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        initParticles();
+      }
+    }
+
+    window.addEventListener("resize", resizeCanvas);
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    initParticles();
+
+    let lastTime = performance.now();
+
+    function animate(now) {
+      const delta = Math.min((now - lastTime) / 1000, 0.05);
+      lastTime = now;
+      const timeScale = delta * 60;
+
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // 2. Move and draw every dot
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i];
-        p.x += p.vx;
-        p.y += p.vy;
+        p.x += p.vx * timeScale;
+        p.y += p.vy * timeScale;
 
-        // Bounce softly off the edges of the screen
-        if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
-        if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+        if (p.x < 0) { p.x = 0; p.vx *= -1; }
+        if (p.x > canvas.width) { p.x = canvas.width; p.vx *= -1; }
+        if (p.y < 0) { p.y = 0; p.vy *= -1; }
+        if (p.y > canvas.height) { p.y = canvas.height; p.vy *= -1; }
 
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
         ctx.fillStyle = DOT_COLOR;
         ctx.fill();
 
-        // 3. Check distance to every other dot and draw a fading line if close enough
         for (let j = i + 1; j < particles.length; j++) {
           const p2 = particles[j];
           const dx = p.x - p2.x;
           const dy = p.y - p2.y;
           const dist = Math.sqrt(dx * dx + dy * dy);
 
-          if (dist < MAX_DISTANCE) {
-            // Line fades smoothly to 0 opacity as dots move farther apart
-            const opacity = 1 - dist / MAX_DISTANCE;
+          if (dist < currentMaxDistance) {
+            const opacity = 1 - dist / currentMaxDistance;
             ctx.beginPath();
             ctx.moveTo(p.x, p.y);
             ctx.lineTo(p2.x, p2.y);
@@ -126,8 +163,7 @@
       requestAnimationFrame(animate);
     }
 
-    initParticles();
-    animate();
+    requestAnimationFrame(animate);
   </script>
 </body>
 </html>
