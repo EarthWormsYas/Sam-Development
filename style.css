@@ -45,7 +45,7 @@ body {
   background-color: rgba(11, 13, 17, 0.85);
   backdrop-filter: blur(8px);
   border: 1px solid rgba(var(--glow-rgb), 0.35);
-  border-radius: 999px;
+  border-radius: 15px;
   padding: 0.45rem 0.75rem;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
   transition: box-shadow 0.3s ease, border-color 0.3s ease;
@@ -65,7 +65,7 @@ body {
   font-size: 0.92rem;
   font-weight: 600;
   padding: 0.35rem 0.9rem;
-  border-radius: 999px;
+  border-radius: 25px;
   transition: color 0.2s ease, background-color 0.2s ease;
   white-space: nowrap;
 }
