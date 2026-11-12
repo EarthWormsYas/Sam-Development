@@ -21,7 +21,7 @@ const PAGES = {
     lineColor: parseColor("rgb(17, 87, 61)"),
     html: `
       <div class="glow-box">
-        <h1>SAM Development</h1>
+        <h1>S.A.M. Development</h1>
         <p><b>Welcome to S.A.M. Development!</b> <i>(Simple Automated Modules)</i><br><br><b>Please consider supporting us by adding one of our bots to your servers!</b></p>
       </div>
     `
