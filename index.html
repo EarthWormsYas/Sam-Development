@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>S.A.M. Development</title>
+  <link id="favicon" rel="icon" href="assets/SAMd.jpg" />
   <style>
     * {
       box-sizing: border-box;
@@ -71,16 +72,18 @@
       return colorStr.match(/\d+/g).map(Number);
     }
 
-    const PAGES = {
+        const PAGES = {
       home: {
         title: "S.A.M. Development",
+        icon: "assets/SAMd.jpg", // Path to your image in the assets folder
         dotColor: parseColor("#0B4640"),
         lineColor: parseColor("rgb(17, 87, 61)"),
         html: `<h1>S.A.M. Development</h1>`
       }
-      // Add new pages here later and link to them with href="#pagename":
+      // Example for another page later:
       // sam: {
       //   title: "S.A.M. — S.A.M. Development",
+      //   icon: "assets/sam-icon.png",
       //   dotColor: parseColor("#8ea1e1"),
       //   lineColor: parseColor("rgb(88, 101, 242)"),
       //   html: `<h1>S.A.M.</h1>`
@@ -122,7 +125,7 @@
     const BASE_AREA = BASE_WIDTH * BASE_HEIGHT;
     const BASE_DIAGONAL = Math.hypot(BASE_WIDTH, BASE_HEIGHT);
 
-    const BASE_PARTICLE_COUNT = 125;
+    const BASE_PARTICLE_COUNT = 115;
     const BASE_MAX_DISTANCE = 140;
     const BASE_SPEED = 0.6;
 
