@@ -28,10 +28,10 @@ const PAGES = {
   }
 };
 
-let currentDotRGB = PAGES.home.dotColor.slice();
-let targetDotRGB = PAGES.home.dotColor.slice();
-let currentLineRGB = PAGES.home.lineColor.slice();
-let targetLineRGB = PAGES.home.lineColor.slice();
+let currentDotRGB = PAGES.SAMd.dotColor.slice();
+let targetDotRGB = PAGES.SAMd.dotColor.slice();
+let currentLineRGB = PAGES.SAMd.lineColor.slice();
+let targetLineRGB = PAGES.SAMd.lineColor.slice();
 
 function renderPage() {
   const hash = window.location.hash.replace("#", "") || "home";
