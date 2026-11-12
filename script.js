@@ -22,7 +22,7 @@ const PAGES = {
     html: `
       <div class="glow-box">
         <h1>SAM Development</h1>
-        <p><b>Welcome to SAM Development!</b> <i>(Simple Automated Modules)</i><br><br><b>Please consider supporting us by adding one of our bots to your servers!</b></p>
+        <p><b>Welcome to S.A.M. Development!</b> <i>(Simple Automated Modules)</i><br><br><b>Please consider supporting us by adding one of our bots to your servers!</b></p>
       </div>
     `
   }
