@@ -34,9 +34,9 @@ let currentLineRGB = PAGES.SAMd.lineColor.slice();
 let targetLineRGB = PAGES.SAMd.lineColor.slice();
 
 function renderPage() {
-  const hash = window.location.hash.replace("#", "") || "home";
+  const hash = window.location.hash.replace("#", "") || "SAMd";
   const page = PAGES[hash] || PAGES.home;
-  const activeKey = PAGES[hash] ? hash : "home";
+  const activeKey = PAGES[hash] ? hash : "SAMd";
 
   document.title = page.title;
 
