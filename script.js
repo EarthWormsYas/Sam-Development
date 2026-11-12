@@ -35,7 +35,7 @@ const PAGES = {
       <img class="page-logo" src="assets/SAM.jpg" alt="S.A.M. Logo" />
       <div class="glow-box">
         <h1>Simple Auto Mod</h1>
-        <p><b>Simple Auto Mod, <i>(aka S.A.M.)<i> is our first bot that we created. SAM is a moderation bot, and are capable of executing all sorts of commands. Although SAM is for moderation, they have some fun commands in there as well!</b></p>
+        <p><b>Simple Auto Mod,</b> <i>(aka S.A.M.)<i> <b>is our first bot that we created. SAM is a moderation bot, and are capable of executing all sorts of commands. Although SAM is for moderation, they have some fun commands in there as well!</b></p>
       </div>
     `
   }
