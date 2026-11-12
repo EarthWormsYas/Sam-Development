@@ -4,8 +4,42 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>S.A.M. Development</title>
-  <link id="favicon" rel="icon" href="assets/SAMd.png" />
+  <link id="favicon" rel="icon" href="assets/SAMd.jpg" />
   <style>
+            :root {
+      --glow-rgb: 11, 70, 64; /* Default fallback (#0B4640) */
+    }
+
+    .glow-box {
+      background-color: #0b0d11;
+      border: 1px solid rgba(var(--glow-rgb), 0.35);
+      border-radius: 14px;
+      padding: 2rem 2.25rem;
+      max-width: 620px;
+      text-align: left;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+      transition: box-shadow 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
+    }
+
+    .glow-box:hover {
+      border-color: rgba(var(--glow-rgb), 0.9);
+      box-shadow:
+        0 0 24px rgba(var(--glow-rgb), 0.75),
+        0 0 52px rgba(var(--glow-rgb), 0.45);
+      transform: translateY(-2px);
+    }
+
+    .glow-box h1 {
+      margin-bottom: 0.75rem;
+      font-size: 2rem;
+    }
+
+    .glow-box p {
+      color: #d4d8e2;
+      line-height: 1.65;
+      font-size: 1.05rem;
+    }
+
     * {
       box-sizing: border-box;
       margin: 0;
@@ -51,6 +85,7 @@
 </head>
 <body>
   <canvas id="particleCanvas"></canvas>
+  
 
   <main id="app">
     <h1>S.A.M. Development</h1>
@@ -72,22 +107,19 @@
       return colorStr.match(/\d+/g).map(Number);
     }
 
-        const PAGES = {
+            const PAGES = {
       home: {
         title: "S.A.M. Development",
-        icon: "assets/SAMd.png", // Path to your image in the assets folder
+        icon: "assets/dev-icon.png",
         dotColor: parseColor("#0B4640"),
         lineColor: parseColor("rgb(17, 87, 61)"),
-        html: `<h1>S.A.M. Development</h1>`
+        html: `
+          <div class="glow-box">
+            <h1>SAM Development</h1>
+            <p><b>Welcome to SAM Development!</b> <i>(Simple Automated Modules)</i><br><br><b>Please consider supporting us by adding one of our bots to your servers!</b></p>
+          </div>
+        `
       }
-      // Example for another page later:
-      // sam: {
-      //   title: "S.A.M. — S.A.M. Development",
-      //   icon: "assets/sam-icon.png",
-      //   dotColor: parseColor("#8ea1e1"),
-      //   lineColor: parseColor("rgb(88, 101, 242)"),
-      //   html: `<h1>S.A.M.</h1>`
-      // }
     };
 
     let currentDotRGB = PAGES.home.dotColor.slice();
@@ -206,9 +238,12 @@
       const colorFadeSpeed = Math.min(1, 0.06 * timeScale);
       lerpColor(currentDotRGB, targetDotRGB, colorFadeSpeed);
       lerpColor(currentLineRGB, targetLineRGB, colorFadeSpeed);
-
-      const dotFill = `rgb(${currentDotRGB.map(Math.round).join(", ")})`;
+      
+      const dotRGBString = currentDotRGB.map(Math.round).join(", ");
+      const dotFill = `rgb(${dotRGBString})`;
       const lineBase = currentLineRGB.map(Math.round).join(", ");
+      document.documentElement.style.setProperty("--glow-rgb", dotRGBString);
+
 
       // Update gliding grid position
       gridX = (gridX + gridVx * timeScale) % GRID_SIZE;
