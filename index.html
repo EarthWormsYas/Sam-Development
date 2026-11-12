@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>S.A.M.</title>
+  <title>S.A.M. Development</title>
   <style>
     * {
       box-sizing: border-box;
@@ -14,6 +14,10 @@
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       background-color: #0f1117;
+      background-image:
+        linear-gradient(to right, #171921 1px, transparent 1px),
+        linear-gradient(to bottom, #171921 1px, transparent 1px);
+      background-size: 40px 40px;
       color: #e6e8ef;
       min-height: 100vh;
       display: flex;
@@ -35,48 +39,113 @@
     main {
       text-align: center;
       padding: 2rem;
+      animation: fadeIn 0.25s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
 <body>
   <canvas id="particleCanvas"></canvas>
 
-  <main>
-    <h1>S.A.M.</h1>
+  <main id="app">
+    <h1>S.A.M. Development</h1>
   </main>
 
   <script>
+    // ==========================================
+    // COLOR HELPER & PAGE DEFINITIONS
+    // ==========================================
+    function parseColor(colorStr) {
+      if (colorStr.startsWith("#")) {
+        const hex = colorStr.replace("#", "");
+        return Array.of(
+          parseInt(hex.slice(0, 2), 16),
+          parseInt(hex.slice(2, 4), 16),
+          parseInt(hex.slice(4, 6), 16)
+        );
+      }
+      return colorStr.match(/\d+/g).map(Number);
+    }
+
+    const PAGES = {
+      home: {
+        title: "S.A.M. Development",
+        dotColor: parseColor("#0B4640"),
+        lineColor: parseColor("rgb(17, 87, 61)"),
+        html: `<h1>S.A.M. Development</h1>`
+      }
+      // Add new pages here later and link to them with href="#pagename":
+      // sam: {
+      //   title: "S.A.M. — S.A.M. Development",
+      //   dotColor: parseColor("#8ea1e1"),
+      //   lineColor: parseColor("rgb(88, 101, 242)"),
+      //   html: `<h1>S.A.M.</h1>`
+      // }
+    };
+
+    let currentDotRGB = PAGES.home.dotColor.slice();
+    let targetDotRGB = PAGES.home.dotColor.slice();
+    let currentLineRGB = PAGES.home.lineColor.slice();
+    let targetLineRGB = PAGES.home.lineColor.slice();
+
+    function renderPage() {
+      const hash = window.location.hash.replace("#", "") || "home";
+      const page = PAGES[hash] || PAGES.home;
+
+      document.title = page.title;
+      const app = document.getElementById("app");
+      app.style.animation = "none";
+      app.offsetHeight;
+      app.style.animation = null;
+      app.innerHTML = page.html;
+
+      targetDotRGB = page.dotColor.slice();
+      targetLineRGB = page.lineColor.slice();
+    }
+
+    window.addEventListener("hashchange", renderPage);
+    renderPage();
+
+    // ==========================================
+    // CANVAS & GLIDING GRID SETTINGS
+    // ==========================================
     const canvas = document.getElementById("particleCanvas");
     const ctx = canvas.getContext("2d");
 
-     // ==========================================
     // LAPTOP VIEWPORT BASELINE (1862 x 880)
-    // ==========================================
     const BASE_WIDTH = 1862;
     const BASE_HEIGHT = 880;
     const BASE_AREA = BASE_WIDTH * BASE_HEIGHT;
     const BASE_DIAGONAL = Math.hypot(BASE_WIDTH, BASE_HEIGHT);
 
-    const BASE_PARTICLE_COUNT = 115;    // Increased from 75 for a fuller web across all window sizes
-    const BASE_MAX_DISTANCE = 140;      // Exact 140px line reach on your laptop
-    const BASE_SPEED = 0.6;             // Exact 0.6 speed on your laptop
-    const DOT_COLOR = "#8ea1e1";
-    const LINE_COLOR = "88, 101, 242";
+    const BASE_PARTICLE_COUNT = 115;
+    const BASE_MAX_DISTANCE = 140;
+    const BASE_SPEED = 0.6;
+
+    // GLIDING BACKGROUND GRID SETTINGS
+    const GRID_SIZE = 40;
+    const GRID_SPEED = 0.1;
+    const gridAngle = Math.atan2(-26.7038 - (-19.4576), -25.1888 - (-11.1569));
+    const gridVx = Math.cos(gridAngle) * GRID_SPEED;
+    const gridVy = Math.sin(gridAngle) * GRID_SPEED;
+    let gridX = 0;
+    let gridY = 0;
 
     let particles = [];
     let currentMaxDistance = BASE_MAX_DISTANCE;
     let lastWidth = window.innerWidth;
 
-        function getResponsiveConfig() {
+    function getResponsiveConfig() {
       const area = canvas.width * canvas.height;
       const diagonal = Math.hypot(canvas.width, canvas.height);
 
-      // Using Math.sqrt(area / BASE_AREA) gives a gentler drop-off on phones
-      // while keeping your laptop at the exact same 75 points
       const areaScale = Math.sqrt(area / BASE_AREA);
       const count = Math.max(32, Math.round(BASE_PARTICLE_COUNT * areaScale));
 
-      // Keep speed & link distance identical to before
       const diagRatio = Math.max(0.45, Math.min(1.25, diagonal / BASE_DIAGONAL));
       const speed = BASE_SPEED * diagRatio;
       const maxDistance = BASE_MAX_DISTANCE * Math.max(0.65, diagRatio);
@@ -100,11 +169,10 @@
       }
     }
 
-        function resizeCanvas() {
+    function resizeCanvas() {
       const widthChanged = window.innerWidth !== lastWidth;
       const heightDiff = Math.abs(window.innerHeight - canvas.height);
 
-      // Rebuilds cleanly when resizing VS Code split panes or rotating a phone
       if (widthChanged || heightDiff > 40) {
         lastWidth = window.innerWidth;
         canvas.width = window.innerWidth;
@@ -118,12 +186,31 @@
     canvas.height = window.innerHeight;
     initParticles();
 
+    function lerpColor(current, target, factor) {
+      for (let i = 0; i < 3; i++) {
+        current[i] += (target[i] - current[i]) * factor;
+      }
+    }
+
     let lastTime = performance.now();
 
     function animate(now) {
       const delta = Math.min((now - lastTime) / 1000, 0.05);
       lastTime = now;
       const timeScale = delta * 60;
+
+      // Smoothly blend dot and line colors toward active page target
+      const colorFadeSpeed = Math.min(1, 0.06 * timeScale);
+      lerpColor(currentDotRGB, targetDotRGB, colorFadeSpeed);
+      lerpColor(currentLineRGB, targetLineRGB, colorFadeSpeed);
+
+      const dotFill = `rgb(${currentDotRGB.map(Math.round).join(", ")})`;
+      const lineBase = currentLineRGB.map(Math.round).join(", ");
+
+      // Update gliding grid position
+      gridX = (gridX + gridVx * timeScale) % GRID_SIZE;
+      gridY = (gridY + gridVy * timeScale) % GRID_SIZE;
+      document.body.style.backgroundPosition = `${gridX}px ${gridY}px`;
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -139,7 +226,7 @@
 
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-        ctx.fillStyle = DOT_COLOR;
+        ctx.fillStyle = dotFill;
         ctx.fill();
 
         for (let j = i + 1; j < particles.length; j++) {
@@ -153,7 +240,7 @@
             ctx.beginPath();
             ctx.moveTo(p.x, p.y);
             ctx.lineTo(p2.x, p2.y);
-            ctx.strokeStyle = `rgba(${LINE_COLOR}, ${opacity * 0.45})`;
+            ctx.strokeStyle = `rgba(${lineBase}, ${opacity * 0.45})`;
             ctx.lineWidth = 1;
             ctx.stroke();
           }
