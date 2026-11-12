@@ -14,8 +14,8 @@ function parseColor(colorStr) {
 }
 
 const PAGES = {
-  home: {
-    title: "SAM Development",
+  SAMd: {
+    title: "S.A.M. Development",
     icon: "assets/SAMd.png",
     dotColor: parseColor("#0B4640"),
     lineColor: parseColor("rgb(17, 87, 61)"),
