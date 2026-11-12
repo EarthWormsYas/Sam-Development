@@ -20,6 +20,7 @@ const PAGES = {
     dotColor: parseColor("#0B4640"),
     lineColor: parseColor("rgb(17, 87, 61)"),
     html: `
+      <img class="page-logo" src="assets/SAMd.jpg" alt="S.A.M. Development Logo" />
       <div class="glow-box">
         <h1>S.A.M. Development</h1>
         <p><b>Welcome to S.A.M. Development!</b> <i>(Simple Automated Modules)</i><br><br><b>Please consider supporting us by adding one of our bots to your servers!</b></p>
