@@ -18,7 +18,7 @@ body {
   color: #e6e8ef;
   min-height: 100vh;
   display: flex;
-  align-items: center;
+  align-items: flex-start; /* Locks content to the top instead of centering vertically */
   justify-content: center;
   overflow-x: hidden;
 }
@@ -81,7 +81,8 @@ main {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 2rem 1.5rem 2rem; /* Increase 11rem to push the logo & box even lower */
+  width: 100%;
+  padding: 13rem 1.5rem 4rem; /* Fixed distance from header (adjust 13rem to match #SAMd) */
   animation: fadeIn 0.25s ease;
 }
 
