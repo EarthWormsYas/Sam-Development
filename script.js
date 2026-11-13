@@ -25,17 +25,23 @@ const PAGES = {
         <h1>S.A.M. Development</h1>
         <p><b>Welcome to S.A.M. Development!</b> <i>(Simple Automated Modules)</i><br><br><b>Please consider supporting us by adding one of our bots to your servers!</b></p>
       </div>
-    `
-  },
+    `},
   SAM: {
     title: "Simple Auto Mod",
+    icon: "assets/SAM.png",
     dotColor: parseColor("#226CAB"),
     lineColor: parseColor("#B3FFFF"),
     html: `
       <img class="page-logo" src="assets/SAM.jpg" alt="S.A.M. Logo" />
       <div class="glow-box">
         <h1>Simple Auto Mod</h1>
-        <p><b>Simple Auto Mod,</b> <i>(aka S.A.M.)<i> <b>is our first bot that we created. SAM is a moderation bot, and are capable of executing all sorts of commands. Although SAM is for moderation, they have some fun commands in there as well!</b></p>
+        <p><b>Simple Auto Mod, <i>(aka S.A.M.)</i> is our first bot that we created. SAM is a moderation bot, and are capable of executing all sorts of commands. Although SAM is for moderation, they have some fun commands in there as well!</b></p>
+        <div class="btn-group">
+          <a class="discord-tile" href="https://discord.com/oauth2/authorize?client_id=1481805991182864394" target="_blank" rel="noopener noreferrer">
+            <img src="assets/Discord.png" alt="Discord Logo" />
+            <span>Authorize<br>App</span>
+          </a>
+        </div>
       </div>
     `
   }
