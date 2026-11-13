@@ -137,3 +137,59 @@ main {
   line-height: 1.65;
   font-size: 1.05rem;
 }
+
+/* Button container inside glow-box */
+.btn-group {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-top: 2.5rem;
+  flex-wrap: wrap;
+}
+
+/* Square Discord Authorize tile */
+.discord-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 170px;
+  height: 170px;
+  background-color: #000120;
+  border: 1px solid rgba(88, 101, 242, 0.35);
+  border-radius: 30px;
+  padding: 1.25rem;
+  text-decoration: none;
+  color: #ffffff;
+  font-family: inherit;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.discord-tile:hover {
+  border-color: rgba(88, 101, 242, 0.9);
+  /* 0px offset-x, 0px offset-y, 70px blur, 5px spread, #5865F2 at 75% opacity */
+  box-shadow: 0 0 70px 5px rgba(88, 101, 242, 0.75);
+}
+
+/* Discord icon inside the tile (moves up & grows on tile hover) */
+.discord-tile img {
+  width: 68px;
+  height: 68px;
+  object-fit: contain;
+  margin-bottom: 0.75rem;
+  transition: transform 0.25s ease;
+}
+
+.discord-tile:hover img {
+  transform: translateY(-6px) scale(1.1);
+}
+
+/* Two-line "Authorize App" label matching the site font */
+.discord-tile span {
+  font-size: 1.1rem;
+  font-weight: 500;
+  line-height: 1.25;
+  text-align: center;
+  color: #ffffff;
+}
